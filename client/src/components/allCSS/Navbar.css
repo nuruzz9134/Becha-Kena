@@ -1,0 +1,28 @@
+
+
+/* .navbar{
+position:fixed;
+width: 100vw;
+} */
+.navbar-link{
+    height: 60px;
+    padding-top: 16px;
+    padding-right: 40px;
+    background-color: rgb(16, 50, 50);
+    display: flex;
+    justify-content: right;
+    list-style-type: none;
+    gap: 20px;
+}
+.navbar-link li{
+    font-size: 26px;
+    font-style: none;
+}
+.navbar-link-box{
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+}
+.navbar-link-box span{
+    color: rgb(250, 0, 0);
+    font-size: 17px;
+}

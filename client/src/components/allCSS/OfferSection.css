@@ -1,0 +1,10 @@
+.offer-section{
+    background-color: rgb(241, 241, 241);
+    display: flex;
+    justify-content: center;
+}
+.offer-section img{
+    width: 90%;
+    height: 350px;
+    padding: 10px;
+}
