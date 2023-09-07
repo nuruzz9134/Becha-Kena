@@ -71,7 +71,7 @@ class VerifyOTP(APIView):
                 email = serializer.data['email']
                 otp = serializer.data['otp']
 
-                user = User.objects.filter(email=email)
+                user = Custom_User.objects.filter(email=email)
 
                 if not user.exists():
                         return Response(

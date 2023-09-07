@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.core.mail import send_mail
-from OLX import settings
+from server import settings
 import random
 from .models import User
 from products.models import *

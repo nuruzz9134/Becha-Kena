@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User
+from users.models import Custom_User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
@@ -8,7 +8,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     # we are writing this because we need confirm password2 field in our Registration Request
     password2 = serializers.CharField(style={'input_type' : 'password'},write_only=True)
     class Meta:
-        model= User
+        model= Custom_User
         fields = ['phone','email','name','user_type','address','state','password','password2']
         extra_kwargs = {'password' : {'write_only':True}    }
 
@@ -22,7 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         print("Validate Data : ",validated_data)
-        return User.objects.create_user(**validated_data)
+        return Custom_User.objects.create_user(**validated_data)
 
 
 
@@ -30,7 +30,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=55)
     class Meta:
-        model = User
+        model = Custom_User
         fields = ['email','password']
 
 
@@ -42,5 +42,5 @@ class VerifyAccountSerializer(serializers.Serializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Custom_User
         fields= ['id','email','name']

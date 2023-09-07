@@ -4,9 +4,9 @@ from django.conf import settings
 from celery import Celery
 
 # Set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE',   'OLX.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE',   'server.settings')
 
-app = Celery('OLX')
+app = Celery('server')
 
 # app.conf.enable_utc = False
 app.conf.timezone = 'Asia/kolkata'

@@ -52,11 +52,3 @@ class Products(models.Model):
     def __str__(self):
         return str(self.id)
 
-
-# class Seller(models.Model):
-#     marchant = models.OneToOneField(user,related_name='customer',
-#         on_delete=models.CASCADE,blank=True, null=True
-#         )
-#     Products = models.ForeignKey(Products,related_name='products',
-#         on_delete=models.CASCADE,blank=True, null=True
-#         )

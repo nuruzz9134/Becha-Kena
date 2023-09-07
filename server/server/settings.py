@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -69,21 +70,26 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'OLX.wsgi.application'
-ASGI_APPLICATION = 'OLX.asgi.application'
+ASGI_APPLICATION = 'server.asgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
+
+# if you want to use your custom user model then uncomment this following line, otherwise you can run through defauilt django model.
+# AUTH_USER_MODEL = 'users.Custom_User'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': '',
-        'USER':'root',
+        'USER':'',
         'PASSWORD':''
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 
 REST_FRAMEWORK = {
@@ -91,8 +97,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
-
-AUTH_USER_MODEL = 'users.User'
 
 
 # Password validation
@@ -119,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -150,7 +154,7 @@ CHANNEL_LAYERS = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
@@ -172,8 +176,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT =  587
-EMAIL_HOST_USER = '******' # use your email
-EMAIL_HOST_PASSWORD = '******' 
+EMAIL_HOST_USER = 'usermallick001@gmail.com' # use your email
+EMAIL_HOST_PASSWORD = ''
 
 
 

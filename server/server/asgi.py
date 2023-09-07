@@ -5,7 +5,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 import chat_group.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'OLX.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
 
 application = get_asgi_application()
 

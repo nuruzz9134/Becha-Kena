@@ -1,3 +1,11 @@
+
+
+# you have both facilities to use User model as custome or default django admin
+# if you chose to custome user model then uncomment the line
+# " AUTH_USER_MODEL = 'users.Custom_User' in  settings.py and erase the "User" model
+
+
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 
@@ -35,7 +43,7 @@ class UserManager(BaseUserManager):
 
 
 
-class User(AbstractBaseUser):
+class Custom_User(AbstractBaseUser):
     user_type_choices=(("admin","admin"),("customer","customer"),("seller","seller"))
     user_type=models.CharField(max_length=10,choices=user_type_choices)
     name = models.CharField(max_length=100, blank=True, null=True)
@@ -70,3 +78,15 @@ class User(AbstractBaseUser):
     def is_staff(self):
         "Is the user a admin member?"
         return self.is_admin
+    
+
+
+
+class User(models.Model):
+    user_type_choices=(("customer","customer"),("seller","seller"))
+    user_type=models.CharField(max_length=10,choices=user_type_choices)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(max_length=100,unique=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
