@@ -76,14 +76,14 @@ ASGI_APPLICATION = 'server.asgi.application'
 AUTH_USER_MODEL = 'users.User'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'e_com',
-        'USER':'root',
-        'PASSWORD':'root'
-    }
-} 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': '',
+#         'USER':'',
+#         'PASSWORD':''
+#     }
+# } 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
