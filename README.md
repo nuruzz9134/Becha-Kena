@@ -36,4 +36,39 @@ Before installing and using the Yarn package manager, you will need to have Node
 ```bash
   node -v
 ```
+install yarn package manager
+```bash
+  yarn install
+```
+to start yarn
+```bash
+  cd Becha-Kena
+  cd client
+  yarn start
+```
+Other dependencies are...
+```bash
+  yarn add react@^18.2.0
+  yarn add react-redux@^8.1.2
+  yarn add @reduxjs/toolkit@^1.9.5
+  yarn add axios@^1.5.0
+  yarn add react-icons@^4.8.0
+  yarn add react-player@^2.13.0
+  yarn add react-razorpay@^2.0.1
+```
 
+
+## backend-settings....
+All dependencies are...
+```bash
+  pip install Django==4.1.6
+  pip install djangorestframework==3.14.0
+  pip install djangorestframework-simplejwt==5.2.2
+  pip install channels==4.0.0
+  python -m pip install -U 'channels[daphne]==4.0.0'
+  pip install django-cors-headers==3.13.0
+  pip install channels-redis==4.1.0
+  pip install celery==5.2.7
+  pip install django-celery-beat==2.5.0
+  pip install django-celery-results==2.5.0
+```
