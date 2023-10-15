@@ -10,24 +10,6 @@ from users.models import *
 
 
 
-
-class Add_CatagoriesViews(APIView):
-    permission_classes = (IsAuthenticated,)
-    def post(self,request):
-        try:
-            if request.user.user_type == "admin":
-                    serializer = CatagorySerializer(data=request.data)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response({"data":serializer.data,"msz": "Created successfully."},status = status.HTTP_201_CREATED)
-                    else:
-                        return Response(repr(serializer.errors),status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"msz": str(e)},status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 class ProductsCreateViews(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self,request):
@@ -36,7 +18,8 @@ class ProductsCreateViews(APIView):
                 serializer = ProductsSerializer(data=request.data)
                 if serializer.is_valid():
                     serializer.save()
-                    return Response({"data":serializer.data,"msz": "Created successfully."},status = status.HTTP_201_CREATED)
+                    return Response({"data":serializer.data,"msz": "Created successfully."},
+                                    status = status.HTTP_201_CREATED)
                 else:
                     return Response(repr(serializer.errors),status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -61,50 +44,40 @@ class ProductsQuantityUpdateViews(APIView):
 
 
 
-
 class AllProductsViews(APIView):
     def get(self,request):
-        name =request.query_params.get("name","")
-        brand =request.query_params.get("brand","")
-        price = request.query_params.get("price","")
-        search = request.query_params.get("search","")
+        data = Products.objects.all()
+        serializer = ProductsSerializer(data,many=True,
+                                        context={"request":request}
+                                        )
+        return Response(serializer.data)
+    
+class SingleProductView(APIView):
+    def get(self,request,pk):
+        try:
+            allData =[]
+            product =  Products.objects.filter(id=pk)
+            product_data_serializer = ProductsSerializer(product,many=True,
+                                        context={"request":request}
+                                        )
+            for i in product_data_serializer.data:
+                a = dict(i)
+                allData.append(a)
+ 
+            img_data = ProductImages.objects.filter(productwithimages=pk)
+            product_img_serializer = SingleProductsSerializer(img_data,many=True,
+                                                  context={"request":request}
+                                                  )
+            img_links = []
+            for k in product_img_serializer.data:
+                for v in dict(k).values():
+                   img_links.append(v)
+            
+            allData[0]["images"]=img_links
 
-        filter_dict = {}
-        if name :
-            filter_dict['name'] = name
-        if brand :
-            filter_dict['brand'] = brand
-        if price :
-            filter_dict['price'] = price
-        if search :
-            data = Products.objects.filter(
-                Q(
-                    Q(name__icontains=search)|
-                    Q(brand__icontains=search)|
-                    Q(price__icontains=search))  &
-                Q(**filter_dict)
-                )
-        else:
-            data = Products.objects.filter(**filter_dict)
-
-        products_data = []
-        for i in data:
-            obj = {}
-            obj = {
-                "Product Name":i.name,
-                "Product Image": str(i.img),
-                "Brand": i.brand,
-                "Colour": i.colour,
-                "Size": i.size,
-                "Price":i.price,
-                "Stocks Available":i.stocks,
-                "Manufacturing Date":i.manufacture_date,
-                "Warranty Time":i.warranty_months,
-                "Replace Date":i.replace_day
-            }
-            products_data.append(obj)
-        return Response({"data":products_data})
-
+            return Response(allData)
+        except Exception as e:
+                return Response({"msz": str(e)},status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -119,3 +92,15 @@ class SellerAndProductsViews(APIView):
         except Exception as e:
             return Response({"msz": str(e)},status=status.HTTP_400_BAD_REQUEST)
 
+
+class AdvertisementImagesApiView(APIView):
+    def get(self,request):
+        data = AdvertisementImages.objects.all()
+        serializer = AdvertisementImagesSerializer(data,many=True,
+                                        context={"request":request}
+                                        )
+        allImg = []
+        for i in serializer.data:
+                for a in dict(i).values():
+                   allImg.append(a)
+        return Response(allImg)

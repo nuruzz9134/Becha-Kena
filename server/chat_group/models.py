@@ -15,11 +15,19 @@ class Group(models.Model):
         on_delete=models.CASCADE,blank=True,null=True)
 
 
-
-class Chat(models.Model):
+class Chats(models.Model):
+    sender = models.ForeignKey(user,related_name='chat_sender',
+        on_delete=models.CASCADE,blank=True,null=True)
     content = models.TextField(blank=True,null=True)
-    group = models.ForeignKey('Group',
-          on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
+    group = models.ForeignKey('Group',
+          on_delete=models.CASCADE,blank=True,null=True)
     
-    
+
+class Images(models.Model):
+    sender = models.ForeignKey(user,related_name='img_sender',
+        on_delete=models.CASCADE,blank=True,null=True)
+    img = models.ImageField(upload_to='chatsimagestore', default=None)
+    timestamp = models.DateTimeField(auto_now=True)
+    group = models.ForeignKey('Group',on_delete=models.CASCADE
+                              ,blank=True,null=True)

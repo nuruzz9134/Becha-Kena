@@ -5,6 +5,5 @@ from . import consumer
 
 
 websocket_urlpatterns = [
-    path('chat/<str:group_name>/',consumer.MyConsumer.as_asgi()),
-
+    path('chatin/<str:group_name>/',consumer.ChateConsumer.as_asgi()),
 ]

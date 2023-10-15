@@ -1,34 +1,31 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { AiOutlineHome} from 'react-icons/ai';
+import {SiProducthunt} from 'react-icons/si';
+import {PiWechatLogoFill} from 'react-icons/pi';
+import {CgProfile} from 'react-icons/cg';
 import { FaShoppingCart} from 'react-icons/fa';
-import "./allCSS/Navbar.css"
-import { useCartContext } from '../context/CartContext';
+import '../Css/navbar.css';
 
 const Navbar = () => {
-    const {total_item } = useCartContext()
-    console.log("total_item>>>",total_item)
   return (
     <div className='navbar'>
         <ul className='navbar-link'>
             <li>
-                <NavLink to='/' className='navbar-link-box'>home</NavLink>
+                <NavLink to='/' className='navbar-link-box'><AiOutlineHome/></NavLink>
             </li>
             <li>
-            <NavLink to='about' className='navbar-link-box'>about</NavLink>
+                <NavLink to='products' className='navbar-link-box'><SiProducthunt/></NavLink>
             </li>
             <li>
-                <NavLink to='contact' className='navbar-link-box'>contact</NavLink>
+                <NavLink to='chats' className='navbar-link-box'><PiWechatLogoFill/></NavLink>
             </li>
             <li>
-                <NavLink to='products' className='navbar-link-box'>Products</NavLink>
-            </li>
-            <li>
-                <NavLink to='login' className='navbar-link-box'>Log in</NavLink>
+                <NavLink to='login' className='navbar-link-box'><CgProfile/></NavLink>
             </li>
             <li>
                 <NavLink to='cart' className='navbar-link-box'>
                     <FaShoppingCart />
-                    <span>{total_item}</span>
                     </NavLink>
             </li>
         </ul>

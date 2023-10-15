@@ -7,11 +7,8 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!%9%o8#dzus-4_ubr**6@(_8fduxgsr%o7shl=md0$onnkwchk'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,13 +27,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'users',
     'products',
     'orders',
     'chat_group',
+    'cart',
     'django_celery_results',
     'django_celery_beat',
+    'razorpay_intigrate.apps.RazorpayConfig'
 ]
 
 MIDDLEWARE = [
@@ -72,20 +72,18 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'server.asgi.application'
 
+# you can run through defauilt django model.
+AUTH_USER_MODEL = 'users.User'
 
-
-
-# if you want to use your custom user model then uncomment this following line, otherwise you can run through defauilt django model.
-# AUTH_USER_MODEL = 'users.Custom_User'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER':'',
-        'PASSWORD':''
+        'NAME': 'e_com',
+        'USER':'root',
+        'PASSWORD':'root'
     }
-}
+} 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -176,8 +174,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT =  587
-EMAIL_HOST_USER = 'usermallick001@gmail.com' # use your email
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 
 
@@ -205,3 +203,7 @@ CACHES = {
 
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+RAZORPAY_KEY_ID= os.environ.get("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET=os.environ.get("RAZORPAY_KEY_SECRET")

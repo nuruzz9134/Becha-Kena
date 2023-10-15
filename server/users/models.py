@@ -1,58 +1,41 @@
 
 
-# you have both facilities to use User model as custome or default django admin
-# if you chose to custome user model then uncomment the line
-# " AUTH_USER_MODEL = 'users.Custom_User' in  settings.py and erase the "User" model
-
-
-
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
+from django.contrib.auth.models import AbstractUser,AbstractBaseUser,BaseUserManager
 
 
 # Custom user manager...
 class UserManager(BaseUserManager):
 
-    def create_user(self, email,name,phone,user_type,address,state, password=None,password2=None):
+    def create_user(self, email,name, password=None,password2=None):
         """Creates and saves a new user"""
         if not email:
-            raise ValueError('User must have an email')
-        if user_type == "admin":
-            user = self.model(email=email,name=name,phone=phone,user_type=user_type,address=address,state=state)
-            user.is_admin = True
-            user.set_password(password)
-            user.save(using=self._db)
-            return user
-        
-        if user_type == "customer":
-            user = self.model(email=email,name=name,phone=phone,user_type=user_type,address=address,state=state)
-            user.set_password(password)
-            user.save(using=self._db)
-            return user
+            raise ValueError('User must have an email address')
+        user = self.model(email=self.normalize_email(email),name=name)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-        if user_type == "seller":
-            user = self.model(email=email,name=name,phone=phone,user_type=user_type,address=address,state=state)
-            user.set_password(password)
-            user.save(using=self._db)
-            return user
 
-        else:
-            raise ValueError('User must have a valid user_type')
+    def create_superuser(self, email,name,password,password2):
+        """creates and save a new super User"""
+        user = self.create_user(email=email, password=password,name=name)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
 
 
 
-
-
-class Custom_User(AbstractBaseUser):
-    user_type_choices=(("admin","admin"),("customer","customer"),("seller","seller"))
-    user_type=models.CharField(max_length=10,choices=user_type_choices)
+class User(AbstractBaseUser):
+    user_type_choices=(("customer","customer"),("seller","seller"))
+    user_type=models.CharField(max_length=10,choices=user_type_choices,
+                               blank=True,null=True)
     name = models.CharField(max_length=100, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    state = models.CharField(max_length=25, blank=True, null=True)
-    phone = models.BigIntegerField(unique=True,blank=True, null=True)
     email = models.EmailField(max_length=100,unique=True)
     otp = models.CharField(max_length=6,null=True,blank=True)
     is_verfied = models.BooleanField(default=False)
+    profile_image = models.ImageField(upload_to="profileImage",
+                                      blank=True,null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -79,14 +62,3 @@ class Custom_User(AbstractBaseUser):
         "Is the user a admin member?"
         return self.is_admin
     
-
-
-
-class User(models.Model):
-    user_type_choices=(("customer","customer"),("seller","seller"))
-    user_type=models.CharField(max_length=10,choices=user_type_choices)
-    name = models.CharField(max_length=100, blank=True, null=True)
-    email = models.EmailField(max_length=100,unique=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)

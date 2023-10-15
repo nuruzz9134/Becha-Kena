@@ -1,0 +1,15 @@
+
+.cart-heading{
+    display: flex;
+    flex-direction: row;
+    padding: 30px;
+    justify-content:space-around;
+}
+
+.cart-image img{
+    width: 80px;
+    height: 50px;
+}
+.cart-remove-icon:hover{
+    size: 30px;
+}

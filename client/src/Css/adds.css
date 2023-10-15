@@ -1,0 +1,25 @@
+.carousel {
+    margin: 60px;
+    display: flex;
+    overflow: hidden;
+    max-width: 100%;
+    justify-content: center;
+  }
+  
+  .carousel-slide {
+    flex: 0 100% 0;
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .carousel img {
+    width: 600px;
+    height: 430px;
+  }
+  
+  .carousel-slide.active {
+    transform: translateX(0%);
+  }
+  
+  .carousel-slide:not(.active) {
+    transform: translateX(100%);
+  }

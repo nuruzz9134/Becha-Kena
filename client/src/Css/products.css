@@ -1,0 +1,46 @@
+
+.filter-column{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    row-gap: 40px;
+    padding: 20px;
+}
+
+.products-container{
+    display: flex;
+    flex-direction: row;
+  
+}
+
+.filter-container-column{
+    width: 300px;
+}
+.filter-category button{
+    margin: 5px;
+    padding: 3px;
+}
+.filter-company select{
+    width: 110px;
+}
+
+.products-list-column{
+    
+}
+
+.products-list{
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.product-img{
+    display: flex;
+    padding: 8px;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+}
+.product-img img{
+    width: 160px;
+    height: 200px;
+}

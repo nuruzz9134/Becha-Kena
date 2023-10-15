@@ -1,100 +1,167 @@
-from django.contrib.auth import authenticate
+
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.exceptions import StopConsumer
-from asgiref.sync import sync_to_async
-from channels.db import database_sync_to_async
-from chat_group.models import *
+from channels.layers import get_channel_layer
 import json
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
-
-
-user = get_user_model()
-
+from .models import *
+from users.models import *
+from channels.db import database_sync_to_async
 
 
 
-@database_sync_to_async
-def get_user(user_id):
-    try:
-        return user.objects.get(id=user_id)
-    except user.DoesNotExist:
-        return AnonymousUser
-
-class QueryAuthMiddleware:
-    """
-    Custom middleware (insecure) that takes user IDs from the query string.
-    """
-
-    def __init__(self, app):
-        # Store the ASGI application we were passed
-        self.app = app
-
-    async def __call__(self, scope, receive, send):
-        # Look up user from query string (you should also do things like
-        # checking if it is a valid user ID, or if scope["user"] is already
-        # populated).
-        scope['user'] = await get_user(int(scope["query_string"]))
-
-        return await self.app(scope, receive, send)
-
-
-
-
-
-class MyConsumer(AsyncWebsocketConsumer):
+class ChateConsumer(AsyncWebsocketConsumer):
+    connected_users = set()
 
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["group_name"]
-        self.group_name =  self.room_name
+        self.room_group_name = "user_%s" % self.room_name
 
-        # Join room group
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-    
+        # print("channel name...",self.channel_name)
 
+        if self.channel_name in self.connected_users:
+            # User is already connected, handle as needed (e.g., reject the connection).
+            await self.close()
+        else:
+            # Add the user to the room's group and the list of connected users
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            channel_name = self.channel_name
+            existed_item = list(self.connected_users)
+            if existed_item:
+                # Notify existing users about the new user's presence
+                await self.channel_layer.send(
+                        existed_item[0],
+                        {
+                            'type': 'user.join',
+                            'username': self.scope['user'].name,
+                            'channelName':channel_name
+                        }
+                    )
+                self.connected_users.add(channel_name)
+            else:
+                self.connected_users.add(channel_name)
+     
         await self.accept()
+        print("websocket connected........")
 
 
+    async def disconnect(self, close_code):
+
+        print("websocket dicconnected.....",close_code)
+        # Leave room group
+        await self.channel_layer.group_discard(
+             self.room_group_name,
+             self.channel_name)
+        self.connected_users.remove(self.channel_name)
 
 
     # Receive message from WebSocket
     async def receive(self, text_data):
 
         data = json.loads(text_data)
-        msg = data['msg']
 
+        if data['type'] == 'call':
+             callSendto = data['to']
+             await self.channel_layer.send(
+             callSendto, {
+                  "type": "chat.call",
+                  "offer": data['offer'],
+                  "from": self.channel_name}
+                )
+             
+        if data['type'] == 'callAccepted':
+             callSendto = data['to']
+             await self.channel_layer.send(
+             callSendto, {
+                  "type": "call.accepted",
+                  "answer": data['answer'],
+                  "from": data['to'] }
+                )
+             
+        if data['type'] == 'nego_needed':
+            # print("offer nego..",data['offer'])
+            callSendto = data['to']
+            await self.channel_layer.send(
+             callSendto, {
+                  "type": "nagotiation.call",
+                  "offer": data['offer'],
+                  "from": self.channel_name}
+                )
+             
+        if data['type'] == 'nego_done':
+             callSendto = data['to']
+             await self.channel_layer.send(
+             callSendto, {
+                  "type": "nagotiation.done",
+                  "answer": data['answer'],
+                #   "from": self.channel_name 
+                  }
+                )
         
-        group = await Group.objects.aget(group_name = self.room_name)
-
-        if self.scope['user'].is_authenticated:
-            chat = Chat(content = msg, group = group)
-            await database_sync_to_async(chat.save)()
-
-            scope_user =self.scope['user'].username
-            data['user'] = scope_user
+        if data['type'] == 'photo':
+            await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat.image", "message": json.dumps(data)}
+                )
+            
+        if data['type'] == 'texts':
+            text = data['text']
+            user = data['user']
+            group = await Group.objects.aget(group_name = self.room_name)
+            message = Chats(content = text, group = group,sender_id=user)
+            await database_sync_to_async(message.save)()
 
             await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat.message", "message": json.dumps(data)}
+            self.room_group_name, {"type": "chat.texts", "message": json.dumps(data)}
                 )
 
-        else:
-            self.send({
-                'text':json.dumps({"msg":"Login Required"})
-            })
-
-        
-
-    # Receive message from room group
-    async def chat_message(self, event):
-        print("message from server.....",event)
-        message = event["message"]
-        # Send message to WebSocket
-        await self.send(text_data= message)
-        
 
 
-async def disconnect(self, close_code):
+    async def chat_call(self, event):
+            await self.send(text_data= json.dumps({
+                 'type':'incomming_call',
+                 'offer': event["offer"],
+                 'from': event["from"]
+            }))
 
-        print("websocket dicconnected.....",close_code)
-        # Leave room group
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+    async def call_accepted(self, event):
+            await self.send(text_data= json.dumps({
+                 'type':'accepted_call',
+                 'answer': event["answer"],
+                 'from': event["from"]
+            }))
+    
+    async def nagotiation_call(self, event):
+            await self.send(text_data= json.dumps({
+                 'type':'incomming_nagotiation',
+                 'offer': event["offer"],
+                 'from': event["from"]
+            }))
+
+    async def nagotiation_done(self, event):
+            await self.send(text_data= json.dumps({
+                 'type':'nagotiation_final',
+                 'answer': event["answer"],
+                #  'from': event["from"]
+            }))
+
+
+
+    async def chat_image(self, event):
+            message = event["message"]
+            await self.send(text_data= message)
+
+    async def chat_texts(self, event):
+            message = event["message"]
+            await self.send(text_data= message)
+
+    async def user_join(self, event):
+            username = event['username']
+            message = f"{username} has joined the room."
+
+            # Send the notification message to the WebSocket
+            await self.send(text_data=json.dumps({
+                 'type':'user_join',
+                'message': message,
+                'channelName': event['channelName']
+            }))

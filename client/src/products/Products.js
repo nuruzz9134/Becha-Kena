@@ -1,24 +1,32 @@
 import React from 'react'
-import FilterSection from '../components/FilterSection'
-import Sort from '../components/Sort'
-import ProductsList from '../components/ProductsList'
-import { useProductContext } from '../context/ProductsContext'
-import '../products/Products.css'
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+
+import Filter from './Filter';
+import ProductsList from './ProductsList';
+import { fetchAsyncallProducts } from '../features/ProductSlice';
+import '../Css/products.css';
 
 
 const Products = () => {
-  // const {products} = useProductContext();
+  let dispatch = useDispatch()
+  dispatch(fetchAsyncallProducts())
+
+
   return (
     <div className='products-container'>
       <div className='filter-container-column'>
-        <FilterSection/>
+        <Filter/>
       </div>
-      <div className='sorted-products-column'>
-        <div ><Sort/></div>
-        <div className='productsList-div'><ProductsList/></div>
+      
+      <div className='products-list-column'>
+        <div className='productsList-div'>
+           <ProductsList/>
+        </div>
       </div>
     </div>
   )
+
 }
 
 export default Products

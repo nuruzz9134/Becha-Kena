@@ -1,13 +1,20 @@
 import React from 'react'
-import OfferSection from '../components/OfferSection'
-import Services from '../components/Services'
-
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useSelector,useDispatch } from 'react-redux';
+import Advertisement from '../components/Advertisement'
+import axios from 'axios';
+import { fetchAsyncallAdds } from '../features/AddSlice';
 
 const Home = () => {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAsyncallAdds())
+  }, []);
+
   return (
     <div>
-      <OfferSection/>
-      <Services/>
+      <Advertisement/>
     </div>
   )
 }

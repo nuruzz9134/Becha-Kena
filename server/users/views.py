@@ -8,8 +8,12 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from .utils import *
 from .tasks import *
+from django.contrib.auth import get_user_model
 
-#Create your views here.
+
+
+User = get_user_model()
+
 
 #generating Token manually
 def get_tokens_for_user(user):
@@ -20,21 +24,32 @@ def get_tokens_for_user(user):
     }
 
 
-
-class UserRegistrationView(APIView):
-    def post (self,request,format=None):
-        serializer = UserRegistrationSerializer(data=request.data)
+class SuperUserRegistrationView(APIView):
+    def post (self,request):
+        serializer = superuserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
-            email = serializer.data['email']
-            registrationEmailMessage(email)
-            token = get_tokens_for_user(user)
+            serializer.save()
             return Response(
-                {'token':token, 'msg': 'Registration Successfull'},
-                status = status.HTTP_201_CREATED
+                    {'msg': 'admin registered'},
+                    status = status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class UserRegistrationView(APIView):
+    def post (self,request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            email = serializer.data['email']
+            user = User.objects.filter(email=email).first()
+            token = get_tokens_for_user(user)
+            return Response(
+                    {'token': token},
+                    status = status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -45,54 +60,46 @@ class UserLoginView(APIView):
             email = serializer.data.get('email')
             password = serializer.data.get('password')
             user = authenticate(email=email, password=password)
-            email = user.email
-            send_otp_via_email(email=email)
             if user is not None:
+                send_otp_via_email(serializer.data['email'])
                 return Response(
-                    {'msg': 'OTP send to your email'},
+                    {'msg': 'OTP send to your email',
+                     'email':email},
                     status = status.HTTP_200_OK
                 )
-
             else:
                 return Response(
-                    {'errors': {'non_field_error': ['Email or Password is not valid']}},
+                    # {'errors': {'non_field_error': ['Email or Password is not valid']}},
+                    {'errors': 'Email does not exist, please register'},
                     status = status.HTTP_400_BAD_REQUEST)
-
-
-
+            
 
 class VerifyOTP(APIView):
     def post(self,request):
         try:
             data = request.data
             serializer = VerifyAccountSerializer(data=data)
-
             if serializer.is_valid():
                 email = serializer.data['email']
                 otp = serializer.data['otp']
+                user = User.objects.filter(email=email)
 
-                user = Custom_User.objects.filter(email=email)
+                userName = user[0].name
+                userid = user[0].id
 
                 if not user.exists():
                         return Response(
                         {
-                            'status' : 400,
-                            'message' : 'Somethimg went wrong',
                             'data': 'invalid email',
-
-                        }
+                        },status = status.HTTP_400_BAD_REQUEST
                     )
-
                 if not user[0].otp == otp:
                         return Response(
                         {
-                            'status' : 400,
                             'message' : 'Somethimg went wrong',
                             'data': 'wrong otp',
-
-                        }
+                        },status = status.HTTP_400_BAD_REQUEST
                     )
-
                 user = user.first()
                 user.is_verfied = True
                 user.save()
@@ -100,21 +107,16 @@ class VerifyOTP(APIView):
                 return Response(
                             {
                                 'token':token,
+                                'userId': userid,
+                                'userName': userName,
                                 'status' : 200,
-                                'message' : 'Acount Verified',
+                                'data' : 'Acount Verified ',
                             }
                     )
-
-
             return Response(
                     {
-                        'status' : 400,
-                        'message' : 'Somethimg went wrong',
-                        'data': serializer.errors,
-
-                    }
+                        'data': 'wrong otp',
+                    },status = status.HTTP_400_BAD_REQUEST
                 )
-
         except Exception as w:
-            return Response(str(w))       
-
+            return Response(str(w))
