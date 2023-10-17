@@ -1,13 +1,18 @@
 # "Becha-Kena" - An Ecommerce Platform
 "Becha-Kena" is a responsive modern "Full Stack" ecommerce application with Payments functionality and P2P communication feature between buyer and seller. Recognising the barriers with individual merchants and startups against big giants' monopoly systems. I realised to build a platform where a buyer or seller can communicate or burgain on their products which facilities are not given by other usual e-commerce platforms.
 
+## Tech Stack
+**Client:**  React Js, Redux 
+
+**Server:**  Django, Django Reast Framework, Django Channels, Celery , WEBRTC, Razorpay
+
 # Features and Functionalities
 - User Registration , Login , Logout , OTP Verification through Mail 
 - Product Searching , Filtering , Sorting 
-- Text Chats , Image Share , Video Conference-call between buyer and seller
+- Text Chats , Image Share , Video Conference-call between buyer and seller using django channels and WEBRTC
 - Add to Cart
 - Razorpay payment system
-- Notifications and Email
+- Notifications and Email using celery
 - Order canceling and Order Tracking
 
 
